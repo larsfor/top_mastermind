@@ -15,10 +15,9 @@ class Game
   def start
     # print_rules
     ask_player_input('solution', @round - 1, 'computer')
-    # # @player = @player == 'human' ? 'computer' : 'human'
+    # @player = @player == 'human' ? 'computer' : 'human'
     @player = 'computer'
     until @round > 12
-      # until @round > 2
       puts "Round #{@round}"
       ask_player_input('guesses', @round - 1, @player)
       board.give_feedback(@round)
@@ -41,7 +40,7 @@ class Game
     guesses = []
     case player_type
     when 'computer' then 4.times { guesses << %w[b y g p].sample }
-    when 'human' then 4.times { guesses << board.ask_for_color }
+    when 'human' then 4.times { guesses << ask_for_color }
     else; puts 'Ask player input - Something went wrong.'; end
 
     place_colors(place, round, guesses)
@@ -68,6 +67,16 @@ class Game
 
   def valid_color(color)
     %w[b y g p].include?(color)
+  end
+
+  def ask_for_color
+    loop do
+      puts 'Choose a color: [b]lue 🔵, [y]ellow 🟡, [g]reen 🟢 or [p]urple 🟣.'
+      color = gets.chomp
+      return color if valid_color(color)
+
+      puts 'Invalid color. Please try again.'
+    end
   end
 
   def print_rules

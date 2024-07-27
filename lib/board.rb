@@ -3,7 +3,6 @@
 require_relative 'game'
 
 # Game class that carries all the information and logic
-
 class Board
   attr_reader :guesses, :feedback, :solution
 
@@ -45,16 +44,6 @@ class Board
         @feedback[round - 1] << :w
         white_count += 1
       end
-    end
-  end
-
-  def ask_for_color
-    loop do
-      puts 'Choose a color: [b]lue 🔵, [y]ellow 🟡, [g]reen 🟢 or [p]urple 🟣.'
-      color = gets.chomp
-      return color if valid_color(color)
-
-      puts 'Invalid color. Please try again.'
     end
   end
 
