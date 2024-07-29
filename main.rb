@@ -4,6 +4,7 @@ require_relative 'lib/game'
 require_relative 'lib/player'
 
 def main
+  # game = Game.new('guesser')
   game = Game.new
   game.start
 end

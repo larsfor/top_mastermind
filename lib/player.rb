@@ -2,7 +2,11 @@
 
 # Game class that carries all the information and logic
 class Player
-  def initialize; end
+  attr_reader :role
+
+  def initialize(role)
+    @role = role
+  end
 end
 
 # The human player

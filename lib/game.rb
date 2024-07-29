@@ -1,25 +1,25 @@
 # frozen_string_literal: true
 
 require_relative 'board'
+require_relative 'player'
 
 # Game class that carries all the information and logic
 class Game
   attr_reader :board
 
-  def initialize
+  def initialize(role = '')
     @board = Board.new
     @round = 1
-    @player = nil
+    @player = guesser_or_creator(role)
   end
 
   def start
     # print_rules
-    ask_player_input('solution', @round - 1, 'computer')
-    # @player = @player == 'human' ? 'computer' : 'human'
-    @player = 'computer'
+    ask_player_input('solution', 0, @player.role)
+    puts "You're now playing as #{@player.role}."
     until @round > 12
       puts "Round #{@round}"
-      ask_player_input('guesses', @round - 1, @player)
+      ask_player_input('guesses', @round - 1, @player.role == 'guesser' ? 'creator' : 'guesser')
       board.give_feedback(@round)
       board.print_board(@round)
       return if game_over?
@@ -29,21 +29,33 @@ class Game
     puts "You didn't manage to find the correct combinations. If you want, you can try again! 😎"
   end
 
+  def ask_player_input(place, round, player_type)
+    guesses = []
+    case player_type
+    when 'guesser' then 4.times { guesses << %w[b y g p].sample }
+    when 'creator' then 4.times { guesses << ask_for_color }
+    else; puts 'Ask player input - Something went wrong.'; end
+
+    place_colors(place, round, guesses)
+  end
+
+  def guesser_or_creator(role)
+    return Player.new(role) if %w[guesser creator].include?(role)
+
+    loop do
+      puts 'Which role do you want to play - "guesser" or "creator".'
+      answer = gets.chomp
+      return Player.new(answer) if %w[guesser creator].include?(answer)
+
+      puts 'Invalid option, please choose eiter "guesser" or "creator".'
+    end
+  end
+
   def game_over?
     return false unless @board.guesses[@round - 1] == @board.solution
 
     puts "Congratulations, you've chosen the correct combinations, and won! 🥳"
     true
-  end
-
-  def ask_player_input(place, round, player_type)
-    guesses = []
-    case player_type
-    when 'computer' then 4.times { guesses << %w[b y g p].sample }
-    when 'human' then 4.times { guesses << ask_for_color }
-    else; puts 'Ask player input - Something went wrong.'; end
-
-    place_colors(place, round, guesses)
   end
 
   def place_colors(place, round, colors)
@@ -71,7 +83,8 @@ class Game
 
   def ask_for_color
     loop do
-      puts 'Choose a color: [b]lue 🔵, [y]ellow 🟡, [g]reen 🟢 or [p]urple 🟣.'
+      puts 'Choose a color: [b]lue 🔵, [y]ellow 🟡, [g]reen 🟢 or [p]urple 🟣.' if @player.role == 'guesser'
+      puts 'Pick four colors as a solution: [b]lue 🔵, [y]ellow 🟡, [g]reen 🟢 or [p]urple 🟣.' if @player.role == 'creator'
       color = gets.chomp
       return color if valid_color(color)
 
